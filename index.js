@@ -1,39 +1,6 @@
 const postcss = require('postcss');
 
-module.exports = {
-  languages: [
-    {
-      name: "CSS",
-      parsers: ["css"],
-      extensions: [".css"],
-      vscodeLanguageIds: ["css"],
-    },
-  ],
-  parsers: {
-    css: {
-      parse: text => {
-        // Use PostCSS to parse the CSS text into an AST
-        const ast = postcss.parse(text);
-        return ast;
-      },
-      astFormat: "css-ast",
-    },
-  },
-  printers: {
-    "css-ast": {
-      print: (path, options, print) => {
-        // Implement your custom printing logic here
-        return customPrintFunction(path, options, print);
-      }
-    }
-  },
-  defaultOptions: {
-    tabWidth: 2,
-  },
-};
-
 function customPrintFunction(path, options, print) {
-  // console.log("Custom Print Function Called");
   const root = path.getValue();
   if (!root || !root.nodes) {
     console.error("Invalid root structure:", root);
@@ -81,28 +48,37 @@ function customPrintFunction(path, options, print) {
     }
   });
 
-  // console.log("Formatted Result:", result);
   return result.trim();
 }
 
-function testCustomPrintFunction() {
-  const mockPath = {
-    getValue: () => ({
-      nodes: [
-        { prop: 'display', value: 'inline-block' },
-        { prop: 'padding', value: '12px 16px' },
-        { prop: 'font-weight', value: 'bold' },
-        { prop: 'white-space', value: 'nowrap' },
-        { prop: 'cursor', value: 'pointer' },
-        { prop: 'border-radius', value: '2px' },
-        { prop: 'font-size', value: '12px' },
-        { prop: 'text-align', value: 'center' }
-      ]
-    })
-  };
-  const output = customPrintFunction(mockPath, {}, console.log);
-  console.log("Output:", output);
-}
-
-// Uncomment the following line to run the test function when the file is executed directly
-// testCustomPrintFunction();
+module.exports = {
+  languages: [
+    {
+      name: "CSS",
+      parsers: ["css"],
+      extensions: [".css"],
+      vscodeLanguageIds: ["css"],
+    },
+  ],
+  parsers: {
+    css: {
+      parse: text => {
+        // Use PostCSS to parse the CSS text into an AST
+        const ast = postcss.parse(text);
+        return ast;
+      },
+      astFormat: "css-ast",
+    },
+  },
+  printers: {
+    "css-ast": {
+      print: (path, options, print) => {
+        // Implement your custom printing logic here
+        return customPrintFunction(path, options, print);
+      }
+    }
+  },
+  defaultOptions: {
+    tabWidth: 2,
+  },
+};
