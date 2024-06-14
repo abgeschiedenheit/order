@@ -33,44 +33,55 @@ module.exports = {
 };
 
 function customPrintFunction(path, options, print) {
-  console.log("Custom Print Function Called");
-  const node = path.getValue();
-  console.log("Node Properties:", node.nodes.map(n => n.prop));
+  // console.log("Custom Print Function Called");
+  const root = path.getValue();
+  if (!root || !root.nodes) {
+    console.error("Invalid root structure:", root);
+    return "";
+  }
 
   const groups = {
     behavior: ["cursor", "display", "position", "float", "clear", "visibility", "overflow", "white-space", "z-index", "overflow-x", "overflow-y"],
     shape: ["width", "height", "padding", "margin", "border", "border-radius", "border-width", "border-style", "border-color", "box-sizing"],
     font: ["font-family", "font-size", "font-weight", "font-style", "line-height", "text-align", "text-transform", "text-decoration", "color", "letter-spacing"],
-    background: ["background", "background-color", "background-image", "background-repeat", "background-position", "background-size"],
-    animation: ["transition", "animation", "animation-name", "animation-duration", "animation-timing-function", "animation-delay", "animation-iteration-count", "animation-direction"],
     layout: ["flex", "flex-basis", "flex-direction", "flex-grow", "flex-shrink", "flex-wrap", "justify-content", "align-items", "align-content", "align-self", "grid", "grid-template-columns", "grid-template-rows", "grid-auto-flow", "grid-gap", "grid-row-gap", "grid-column-gap", "grid-area", "grid-row", "grid-column"],
     miscellaneous: ["opacity", "filter", "clip", "clip-path", "mask"]
   };
 
-  const orderedProps = [];
-  const groupNames = Object.keys(groups);
-  groupNames.forEach(group => {
-    orderedProps.push(...groups[group]);
-  });
-
-  node.nodes.sort((a, b) => {
-    const indexA = orderedProps.indexOf(a.prop) !== -1 ? orderedProps.indexOf(a.prop) : orderedProps.length;
-    const indexB = orderedProps.indexOf(b.prop) !== -1 ? orderedProps.indexOf(b.prop) : orderedProps.length;
-    return indexA - indexB;
-  });
-
-  let currentGroup = null;
   let result = '';
-  node.nodes.forEach(prop => {
-    const propGroup = groupNames.find(group => groups[group].includes(prop.prop));
-    if (currentGroup !== propGroup) {
-      if (result !== '') result += '\n';
-      currentGroup = propGroup;
+  root.nodes.forEach(rule => {
+    if (rule.type === 'rule' && rule.nodes) {
+      result += `${rule.selector} {\n`; // Include the rule selector and opening brace
+
+      const grouped = { behavior: [], font: [], shape: [], style: [], other: [] };
+      rule.nodes.forEach(decl => {
+        if (decl.type === 'decl') {
+          let found = false;
+          for (const group in groups) {
+            if (groups[group].includes(decl.prop)) {
+              grouped[group].push(decl);
+              found = true;
+              break;
+            }
+          }
+          if (!found) grouped.other.push(decl);
+        }
+      });
+
+      for (const group in grouped) {
+        grouped[group].forEach(decl => {
+          result += `  ${decl.prop}: ${decl.value};\n`; // Indent properties for better readability
+        });
+        if (group !== Object.keys(grouped).pop()) { // Check if it's not the last group
+          result += '\n'; // Add a newline between groups
+        }
+      }
+      result = result.trim(); // Trim the final result to remove any trailing new lines
+      result += '\n}\n'; // Include the closing brace
     }
-    result += `${prop.prop}: ${prop.value};\n`;
   });
 
-  console.log("Formatted Result:", result);
+  // console.log("Formatted Result:", result);
   return result.trim();
 }
 
@@ -94,4 +105,4 @@ function testCustomPrintFunction() {
 }
 
 // Uncomment the following line to run the test function when the file is executed directly
-testCustomPrintFunction();
+// testCustomPrintFunction();

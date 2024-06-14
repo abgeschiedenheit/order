@@ -6,7 +6,8 @@ Credit to [Lochie](https://nitter.poast.org/jcb/status/1798094424775242203#m).
 
 ## example
 
-Unordered:
+Before:
+
 ```css
 button {
   display: inline-block;
@@ -20,7 +21,7 @@ button {
 }
 ```
 
-Ordered:
+After (one variation):
 
 ```css
 button {
