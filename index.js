@@ -26,25 +26,35 @@ function customPrintFunction(path, options, print) {
           let found = false;
           for (const group in groups) {
             if (groups[group].includes(decl.prop)) {
+              if (!grouped[group]) {
+                grouped[group] = []; // Ensure the array is initialized
+              }
               grouped[group].push(decl);
               found = true;
               break;
             }
           }
-          if (!found) grouped.other.push(decl);
+          if (!found) {
+            if (!grouped.other) {
+              grouped.other = []; // Ensure the 'other' array is initialized
+            }
+            grouped.other.push(decl);
+          }
         }
       });
 
-      for (const group in grouped) {
-        grouped[group].forEach(decl => {
-          result += `  ${decl.prop}: ${decl.value};\n`; // Indent properties for better readability
-        });
-        if (group !== Object.keys(grouped).pop()) { // Check if it's not the last group
-          result += '\n'; // Add a newline between groups
+      const groupKeys = Object.keys(grouped);
+      groupKeys.forEach((group, index) => {
+        if (grouped[group].length > 0) { // Check if there are declarations in the group
+          grouped[group].forEach(decl => {
+            result += `  ${decl.prop}: ${decl.value};\n`;
+          });
+          if (index !== groupKeys.length - 1 && grouped[groupKeys[index + 1]].length > 0) { // Check if next group also has declarations
+            result += '\n'; // Add a newline between groups
+          }
         }
-      }
-      result = result.trim(); // Trim the final result to remove any trailing new lines
-      result += '\n}\n'; // Include the closing brace
+      });
+      result += '}\n\n'; // Include the closing brace and add a newline
     }
   });
 
