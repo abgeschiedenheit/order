@@ -1,8 +1,8 @@
 # order (WIP)
 
-Prettier plugin for property ordering – meaning, grouping by behaviour: font, shape, style, et cetera.
+Prettier plugin for property ordering – meaning, grouping by behaviour: font, shape, style, et cetera. It makes for easier reading.
 
-Credit to [Jacob and Lochie](https://nitter.poast.org/jcb/status/1798094424775242203#m).
+Credit to [Jacob and, particularly, Lochie](https://nitter.poast.org/jcb/status/1798094424775242203#m) for the idea.
 
 ## example
 
@@ -21,7 +21,7 @@ button {
 }
 ```
 
-After (one variation):
+After:
 
 ```css
 button {
